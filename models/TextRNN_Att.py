@@ -58,14 +58,33 @@ class Model(nn.Module):
         self.fc = nn.Linear(config.hidden_size2, config.num_classes)
 
     def forward(self, x):
-        x, _ = x
-        emb = self.embedding(x)  # [batch_size, seq_len, embeding]=[128, 32, 300]
-        H, _ = self.lstm(emb)  # [batch_size, seq_len, hidden_size * num_direction]=[128, 32, 256]
-
+        print("x.shape")
+        print(x[0].shape,x[1].shape)
+        x, _ = x # TODO step.1 模型输入
+        emb = self.embedding(x)  # TODO step.2 [batch_size, seq_len, embeding]=[128, 32, 300]
+        # print(emb[0][0])
+        print("emb.shape")
+        print(emb.shape)
+        H, _ = self.lstm(emb)  # TODO step.3 [batch_size, seq_len, hidden_size * num_direction]=[128, 32, 256]
+        print("H.shape")
+        print(H.shape)
         M = self.tanh1(H)  # [128, 32, 256]
+        print("M.shape")
+        print(M.shape)
         # M = torch.tanh(torch.matmul(H, self.u))
+        # TODO step.4 对LSTM的输出进行非线性激活后与w进行矩阵相乘，并经行softmax归一化
+        tmp = torch.matmul(M, self.w)
+        print("tmp.shape")
+        print(tmp.shape)
         alpha = F.softmax(torch.matmul(M, self.w), dim=1).unsqueeze(-1)  # [128, 32, 1]
+        print(alpha)
+        print("alpha.shape")
+        print(alpha.shape)
+        # TODO step.6 将LSTM的每一时刻的隐层状态乘对应的分值后求和，得到加权平均后的终极隐层值
         out = H * alpha  # [128, 32, 256]
+        print("out.shape")
+        print(out.shape)
+        # TODO 在句子的维度求和
         out = torch.sum(out, 1)  # [128, 256]
         out = F.relu(out)
         out = self.fc1(out)
