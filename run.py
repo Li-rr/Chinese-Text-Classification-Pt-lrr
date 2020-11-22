@@ -20,6 +20,8 @@ if __name__ == '__main__':
     embedding = 'embedding_SougouNews.npz'
     if args.embedding == 'random':
         embedding = 'random'
+    
+    # 'TextCapsule'
     model_name = args.model  # 'TextRCNN'  # TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer
     if model_name == 'FastText':
         from utils_fasttext import build_dataset, build_iterator, get_time_dif
@@ -45,7 +47,10 @@ if __name__ == '__main__':
 
     # train
     config.n_vocab = len(vocab)
+    # print("embedding_pretrained",config.embedding_pretrained)
+    config.embedding_pretrained = None
     model = x.Model(config).to(config.device)
+    print(model)
     if model_name != 'Transformer':
         init_network(model)
     print(model.parameters)
