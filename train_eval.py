@@ -12,14 +12,18 @@ from tensorboardX import SummaryWriter
 # 权重初始化，默认xavier
 def init_network(model, method='xavier', exclude='embedding', seed=123):
     for name, w in model.named_parameters():
+        # print("------------------------------")
+        # print("name {} w's shape {}\n".format(name,w.shape))
         if exclude not in name:
-            if 'weight' in name:
+            if 'weight' in name and name != "batch.weight":
                 if method == 'xavier':
                     nn.init.xavier_normal_(w)
                 elif method == 'kaiming':
                     nn.init.kaiming_normal_(w)
                 else:
                     nn.init.normal_(w)
+            elif name == "batch.weight":
+                    nn.init.normal_(w, mean=1, std=0.02)
             elif 'bias' in name:
                 nn.init.constant_(w, 0)
             else:
