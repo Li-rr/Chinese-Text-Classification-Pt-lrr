@@ -1,6 +1,7 @@
 # coding: UTF-8
 import time
 import torch
+import sys
 import numpy as np
 from train_eval import train, init_network
 from importlib import import_module
@@ -54,4 +55,5 @@ if __name__ == '__main__':
     if model_name != 'Transformer':
         init_network(model)
     print(model.parameters)
+    # sys.exit(1)
     train(config, model, train_iter, dev_iter, test_iter)

@@ -7,7 +7,8 @@ from sklearn import metrics
 import time
 from utils import get_time_dif
 from tensorboardX import SummaryWriter
-
+from logginger import init_logger
+import logging
 
 # 权重初始化，默认xavier
 def init_network(model, method='xavier', exclude='embedding', seed=123):
@@ -41,12 +42,19 @@ def train(config, model, train_iter, dev_iter, test_iter):
     dev_best_loss = float('inf')
     last_improve = 0  # 记录上次验证集loss下降的batch数
     flag = False  # 记录是否很久没有效果提升
+    look_falg = 1
+    logger = init_logger(log_name="查看attention",log_dir=config.log_path2)
+    logger.info("开始训练")
+    # logger.setLevel(level=logging.WARNING)
     writer = SummaryWriter(log_dir=config.log_path + '/' + time.strftime('%m-%d_%H.%M', time.localtime()))
     for epoch in range(config.num_epochs):
         print('Epoch [{}/{}]'.format(epoch + 1, config.num_epochs))
         # scheduler.step() # 学习率衰减
         for i, (trains, labels) in enumerate(train_iter):
-            outputs = model(trains)
+            if look_falg == 1:
+                outputs,att_alpha = model(trains,look_falg)
+            else:
+                outputs = model(trains)
             model.zero_grad()
             loss = F.cross_entropy(outputs, labels)
             loss.backward()
@@ -71,6 +79,10 @@ def train(config, model, train_iter, dev_iter, test_iter):
                 writer.add_scalar("loss/dev", dev_loss, total_batch)
                 writer.add_scalar("acc/train", train_acc, total_batch)
                 writer.add_scalar("acc/dev", dev_acc, total_batch)
+                logger.info("查看attention")
+                tmp = att_alpha.cpu()
+                logger.info(tmp)
+                logger.info(max(tmp))
                 model.train()
             total_batch += 1
             if total_batch - last_improve > config.require_improvement:
@@ -105,9 +117,13 @@ def evaluate(config, model, data_iter, test=False):
     loss_total = 0
     predict_all = np.array([], dtype=int)
     labels_all = np.array([], dtype=int)
+    look_falg = 1
     with torch.no_grad():
         for texts, labels in data_iter:
-            outputs = model(texts)
+            if look_falg == 1:
+                outputs,aplha = model(texts,look_falg)
+            else:
+                outputs = model(texts)
             loss = F.cross_entropy(outputs, labels)
             loss_total += loss
             labels = labels.data.cpu().numpy()
