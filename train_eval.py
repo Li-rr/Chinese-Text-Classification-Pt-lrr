@@ -42,8 +42,8 @@ def train(config, model, train_iter, dev_iter, test_iter):
     dev_best_loss = float('inf')
     last_improve = 0  # 记录上次验证集loss下降的batch数
     flag = False  # 记录是否很久没有效果提升
-    look_falg = 1
-    logger = init_logger(log_name="查看attention",log_dir=config.log_path2)
+    look_falg = 0
+    logger = init_logger(log_name="查看attention",log_dir=config.log_path)
     logger.info("开始训练")
     # logger.setLevel(level=logging.WARNING)
     writer = SummaryWriter(log_dir=config.log_path + '/' + time.strftime('%m-%d_%H.%M', time.localtime()))
@@ -80,9 +80,9 @@ def train(config, model, train_iter, dev_iter, test_iter):
                 writer.add_scalar("acc/train", train_acc, total_batch)
                 writer.add_scalar("acc/dev", dev_acc, total_batch)
                 logger.info("查看attention")
-                tmp = att_alpha.cpu()
-                logger.info(tmp)
-                logger.info(max(tmp))
+                #tmp = att_alpha.cpu()
+                #logger.info(tmp)
+                #logger.info(max(tmp))
                 model.train()
             total_batch += 1
             if total_batch - last_improve > config.require_improvement:
@@ -117,7 +117,7 @@ def evaluate(config, model, data_iter, test=False):
     loss_total = 0
     predict_all = np.array([], dtype=int)
     labels_all = np.array([], dtype=int)
-    look_falg = 1
+    look_falg = 0
     with torch.no_grad():
         for texts, labels in data_iter:
             if look_falg == 1:
