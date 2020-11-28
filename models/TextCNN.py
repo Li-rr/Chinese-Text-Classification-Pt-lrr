@@ -36,7 +36,8 @@ class Config(object):
         self.filter_sizes = (2, 3, 4)                                   # 卷积核尺寸
         self.num_filters = 256                                          # 卷积核数量(channels数)
 
-
+        print("查看pre-Embedding",self.embedding_pretrained.shape)
+        print("---->",np.load(dataset+"/data/"+embedding))
 '''Convolutional Neural Networks for Sentence Classification'''
 
 

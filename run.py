@@ -19,6 +19,8 @@ if __name__ == '__main__':
 
     # 搜狗新闻:embedding_SougouNews.npz, 腾讯:embedding_Tencent.npz, 随机初始化:random
     embedding = 'embedding_SougouNews.npz'
+    #embedding = 'embedding_wiki_w2c.npz'
+    #embedding = 'embedding_wiki_cw2c.npz'
     if args.embedding == 'random':
         embedding = 'random'
     
@@ -49,7 +51,7 @@ if __name__ == '__main__':
     # train
     config.n_vocab = len(vocab)
     # print("embedding_pretrained",config.embedding_pretrained)
-    config.embedding_pretrained = None
+    #config.embedding_pretrained 
     model = x.Model(config).to(config.device)
     print(model)
     if model_name != 'Transformer':
