@@ -4,12 +4,13 @@ import torch
 import numpy as np
 import pickle as pkl
 from tqdm import tqdm
+import jieba
 import time
 from datetime import timedelta
 from gensim.models import Word2Vec
 from data_transmformer import DataTransformer
 
-MAX_VOCAB_SIZE = 10000  # 词表长度限制
+MAX_VOCAB_SIZE = 100000  # 词表长度限制
 UNK, PAD = '<UNK>', '<PAD>'  # 未知字，padding符号
 
 
@@ -33,7 +34,8 @@ def build_vocab(file_path, tokenizer, max_size, min_freq):
 
 def build_dataset(config, ues_word):
     if ues_word:
-        def tokenizer(x): return x.split(' ')  # 以空格隔开，word-level
+        #def tokenizer(x): return x.split(' ')  # 以空格隔开，word-level
+        def tokenizer(x): return list(jieba.cut(x,cut_all=False))
     else:
         def tokenizer(x): return [y for y in x]  # char-level
     if os.path.exists(config.vocab_path):
@@ -232,18 +234,19 @@ if __name__ == "__main__":
     wiki_cw2c = "/home/stu/Documents/dataset/wiki/cw2vec_300d"
     emb_dim = 300
     filename_trimmed_dir = "./THUCNews/data/embedding_SougouNews"
-    if os.path.exists(vocab_dir):
+    if os.path.exists(vocab_dir) and False:
         word_to_id = pkl.load(open(vocab_dir, 'rb'))
     else:
+        def tokenizer(x): return list(jieba.cut(x,cut_all=False))
         # tokenizer = lambda x: x.split(' ')  # 以词为单位构建词表(数据集中词之间以空格隔开)
-        def tokenizer(x): return [y for y in x]  # 以字为单位构建词表
+        #def tokenizer(x): return [y for y in x]  # 以字为单位构建词表
         word_to_id = build_vocab(
             train_dir, tokenizer=tokenizer, max_size=MAX_VOCAB_SIZE, min_freq=1)
         pkl.dump(word_to_id, open(vocab_dir, 'wb'))
 
-    # get_sogo_w2c(word_to_id=word_to_id,pretrain_dir=pretrain_dir)
+    get_sogo_w2c(word_to_id=word_to_id,pretrain_dir=pretrain_dir)
     # get_wiki_word2vec(
     #     word_to_id=word_to_id,
     #     pretrain_dir=wiki_w2c
     # )
-    get_wiki_cw2vec(word_to_id=word_to_id, pretrain_dir=wiki_cw2c)
+    #get_wiki_cw2vec(word_to_id=word_to_id, pretrain_dir=wiki_cw2c)
