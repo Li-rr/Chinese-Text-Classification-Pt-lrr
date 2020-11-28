@@ -79,7 +79,7 @@ def train(config, model, train_iter, dev_iter, test_iter):
                 writer.add_scalar("loss/dev", dev_loss, total_batch)
                 writer.add_scalar("acc/train", train_acc, total_batch)
                 writer.add_scalar("acc/dev", dev_acc, total_batch)
-                logger.info("查看attention")
+                #logger.info("查看attention")
                 #tmp = att_alpha.cpu()
                 #logger.info(tmp)
                 #logger.info(max(tmp))
